@@ -6,6 +6,7 @@ import africa.civicbridge.api.dto.SignupRequest;
 import africa.civicbridge.api.entity.AppUser;
 import africa.civicbridge.api.repository.AppUserRepository;
 import africa.civicbridge.api.security.JwtUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -32,6 +33,10 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
+    @Operation(
+            summary = "Create a Youth User account and get a token",
+            description = "Always creates the 'Youth User' role. Returns a JWT you can use immediately — no separate login call needed."
+    )
     public ResponseEntity<?> signup(@Valid @RequestBody SignupRequest req) {
         if (users.existsByEmail(req.email())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", "Email already registered"));
@@ -50,6 +55,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Operation(
+            summary = "Log in and get a token",
+            description = "Use a seeded demo account (see this page's top description) or one created via /signup. "
+                    + "Copy the returned 'token' into the Authorize button above to unlock 🔒 endpoints."
+    )
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
         return users.findByEmail(req.email())
                 .filter(u -> passwordEncoder.matches(req.password(), u.getPassword()))

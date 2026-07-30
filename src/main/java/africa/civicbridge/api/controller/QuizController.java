@@ -1,16 +1,17 @@
 package africa.civicbridge.api.controller;
 
+import africa.civicbridge.api.dto.QuizResultRequest;
 import africa.civicbridge.api.entity.Quiz;
 import africa.civicbridge.api.entity.QuizResult;
 import africa.civicbridge.api.repository.QuizRepository;
 import africa.civicbridge.api.repository.QuizResultRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/quizzes")
@@ -37,11 +38,9 @@ public class QuizController {
 
     @PostMapping("/{id}/results")
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<QuizResult> submitResult(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+    public ResponseEntity<QuizResult> submitResult(@PathVariable Long id, @Valid @RequestBody QuizResultRequest req) {
         if (!quizzes.existsById(id)) return ResponseEntity.notFound().build();
-        Long userId = Long.valueOf(String.valueOf(body.get("userId")));
-        Integer scorePercent = Integer.valueOf(String.valueOf(body.get("scorePercent")));
-        QuizResult saved = results.save(new QuizResult(id, userId, scorePercent));
+        QuizResult saved = results.save(new QuizResult(id, req.userId(), req.scorePercent()));
         return ResponseEntity.ok(saved);
     }
 

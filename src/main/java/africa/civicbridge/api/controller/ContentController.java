@@ -33,6 +33,7 @@ public class ContentController {
     @PostMapping
     @SecurityRequirement(name = "bearerAuth")
     public CivicContent create(@RequestBody CivicContent content) {
+        content.setId(null); // ignore any client-supplied id so this can never overwrite an existing row
         return repo.save(content);
     }
 
