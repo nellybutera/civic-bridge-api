@@ -5,11 +5,16 @@ implementing the Next.js + Spring Boot + PostgreSQL architecture specified in th
 
 **Live API:** https://civic-bridge-api.onrender.com
 
+**Interactive API docs (Swagger UI):** https://civic-bridge-api.onrender.com/swagger-ui/index.html
+(raw OpenAPI spec at `/v3/api-docs`). Click **Authorize** and paste `Bearer <token>` from a
+`/api/auth/login` response to try the role-gated endpoints directly from the browser.
+
 ## Tech stack
 
 - Java 17, Spring Boot 4 (Web MVC, Spring Data JPA, Bean Validation)
 - PostgreSQL
 - BCrypt password hashing + JWT (`io.jsonwebtoken`) for auth
+- springdoc-openapi for Swagger/OpenAPI docs
 - Deployed on Render (Docker)
 
 ## Modules / endpoints
