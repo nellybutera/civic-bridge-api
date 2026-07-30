@@ -10,4 +10,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping the live API
-        run: curl -s -o /dev/null -w "status: %{http_code}\n" https://civic-bridge-api.onrender.com/api/content
+        run: |
+          curl -s -o /dev/null -w "status: %{http_code}\n" https://civic-bridge-api.onrender.com/api/content
