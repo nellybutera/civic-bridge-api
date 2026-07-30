@@ -3,11 +3,16 @@
 Spring Boot REST API for [Civic Bridge Africa](https://github.com/nellybutera/civic-bridge),
 implementing the Next.js + Spring Boot + PostgreSQL architecture specified in the project's SRS.
 
-**Live API:** https://civic-bridge-api.onrender.com
-
 **Interactive API docs (Swagger UI):** https://civic-bridge-api.onrender.com/swagger-ui/index.html
 (raw OpenAPI spec at `/v3/api-docs`). Click **Authorize** and paste `Bearer <token>` from a
-`/api/auth/login` response to try the role-gated endpoints directly from the browser.
+`/api/auth/login` response to try the role-gated endpoints directly from the browser. This is
+the link to use to see the API is live — hitting the bare root URL
+(`https://civic-bridge-api.onrender.com/`) returns a 500 by design, since there's no landing
+route mapped there.
+
+The backend is a Render free-tier instance that sleeps after ~15 minutes idle. A GitHub Actions
+cron in this repo (`.github/workflows/keep-warm.yml`) pings it every 10 minutes to keep this
+rare, but the first request after a long gap can still take up to ~2 minutes to wake it up.
 
 ## Tech stack
 
@@ -31,6 +36,11 @@ Role-gated write endpoints require an `Authorization: Bearer <token>` header wit
 issued by `/api/auth/login` or `/api/auth/signup`. Requests without a valid token, or from a
 role not permitted for that action, are rejected server-side (401/403) regardless of what the
 client claims — see `RoleAuthorizationFilter`.
+
+Civic content carries a `sourceUrl` (every article links its verified original source) and
+forum posts carry a `topic` (the discussion room a post belongs to — e.g. "Regional Trade",
+"Youth Employment", "Elections"; omitted/null posts are treated as "General"). Three quizzes
+are seeded at startup, covering parliamentary process, civic rights, and what the AU/EAC do.
 
 ## Running locally
 
@@ -75,13 +85,12 @@ client claims — see `RoleAuthorizationFilter`.
 3. Add environment variables: `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` (from
    your Postgres instance's **external** connection details) and `JWT_SECRET` (a long random
    string — do not use the fallback dev value baked into `application.properties`).
-4. Deploy. Render assigns a public URL once the build finishes.
-5. **Note:** auto-deploy-on-push is not enabled by default on new Render web services in all
-   cases — check the service settings, or click "Deploy latest commit" manually after each push.
+4. Deploy. Render assigns a public URL once the build finishes and will auto-deploy on every
+   push to `main` from then on.
 
 ## Relationship to the frontend
 
-This API is a standalone backend matching the SRS's intended architecture. The deployed
-[Next.js frontend](https://github.com/nellybutera/civic-bridge) currently persists data to
-browser `localStorage` instead of calling this API — see that repo's `ARCHITECTURE.md` for the
-documented migration path from localStorage to this backend.
+The deployed [Next.js frontend](https://github.com/nellybutera/civic-bridge) calls this API
+directly over HTTPS for everything — auth, civic content, quizzes and results, the forum, and
+the regional tracker. There is no client-side data layer; the only thing the frontend keeps in
+the browser is the session JWT itself, in `localStorage`, so a page refresh doesn't log you out.
