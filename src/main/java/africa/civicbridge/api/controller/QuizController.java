@@ -4,6 +4,8 @@ import africa.civicbridge.api.entity.Quiz;
 import africa.civicbridge.api.entity.QuizResult;
 import africa.civicbridge.api.repository.QuizRepository;
 import africa.civicbridge.api.repository.QuizResultRepository;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/quizzes")
+@Tag(name = "Quizzes", description = "Quiz content and result submission. Reads are public; submitting a result requires any logged-in user's JWT.")
 public class QuizController {
 
     private final QuizRepository quizzes;
@@ -33,6 +36,7 @@ public class QuizController {
     }
 
     @PostMapping("/{id}/results")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<QuizResult> submitResult(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         if (!quizzes.existsById(id)) return ResponseEntity.notFound().build();
         Long userId = Long.valueOf(String.valueOf(body.get("userId")));

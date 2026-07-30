@@ -6,6 +6,7 @@ import africa.civicbridge.api.dto.SignupRequest;
 import africa.civicbridge.api.entity.AppUser;
 import africa.civicbridge.api.repository.AppUserRepository;
 import africa.civicbridge.api.security.JwtUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Auth", description = "Signup and login. Both issue a JWT — pass it as 'Bearer <token>' via the Authorize button above to call protected endpoints.")
 public class AuthController {
 
     private final AppUserRepository users;

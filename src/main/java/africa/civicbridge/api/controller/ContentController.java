@@ -2,6 +2,8 @@ package africa.civicbridge.api.controller;
 
 import africa.civicbridge.api.entity.CivicContent;
 import africa.civicbridge.api.repository.CivicContentRepository;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/content")
+@Tag(name = "Civic Content", description = "Governance/civic-rights explainers. Reads are public; writes require an Admin JWT.")
 public class ContentController {
 
     private final CivicContentRepository repo;
@@ -28,11 +31,13 @@ public class ContentController {
     }
 
     @PostMapping
+    @SecurityRequirement(name = "bearerAuth")
     public CivicContent create(@RequestBody CivicContent content) {
         return repo.save(content);
     }
 
     @PutMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<CivicContent> update(@PathVariable Long id, @RequestBody CivicContent update) {
         return repo.findById(id).map(existing -> {
             existing.setTitle(update.getTitle());
@@ -45,6 +50,7 @@ public class ContentController {
     }
 
     @DeleteMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (!repo.existsById(id)) return ResponseEntity.notFound().build();
         repo.deleteById(id);
