@@ -33,6 +33,9 @@ public class ForumPost {
     @Schema(example = "I want to attend one in person but can't find a public schedule anywhere. Any tips?")
     private String body;
 
+    @Schema(example = "Regional Trade", description = "The discussion room this post belongs to. Null/omitted posts appear under General.")
+    private String topic;
+
     @Schema(accessMode = Schema.AccessMode.READ_ONLY, example = "2026-07-22T14:30:00Z")
     private Instant createdAt;
 
@@ -41,6 +44,15 @@ public class ForumPost {
         this.authorRole = authorRole;
         this.title = title;
         this.body = body;
+        this.createdAt = Instant.now();
+    }
+
+    public ForumPost(String authorName, String authorRole, String title, String body, String topic) {
+        this.authorName = authorName;
+        this.authorRole = authorRole;
+        this.title = title;
+        this.body = body;
+        this.topic = topic;
         this.createdAt = Instant.now();
     }
 

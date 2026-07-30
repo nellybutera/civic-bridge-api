@@ -46,6 +46,7 @@ public class ContentController {
             existing.setSummary(update.getSummary());
             existing.setBody(update.getBody());
             existing.setReadMinutes(update.getReadMinutes());
+            existing.setSourceUrl(update.getSourceUrl());
             return ResponseEntity.ok(repo.save(existing));
         }).orElse(ResponseEntity.notFound().build());
     }

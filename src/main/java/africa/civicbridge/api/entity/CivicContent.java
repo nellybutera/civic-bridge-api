@@ -35,11 +35,23 @@ public class CivicContent {
     @Schema(example = "4")
     private Integer readMinutes;
 
+    @Schema(example = "https://www.eac.int/eac-treaty")
+    private String sourceUrl;
+
     public CivicContent(String title, String category, String summary, String body, Integer readMinutes) {
         this.title = title;
         this.category = category;
         this.summary = summary;
         this.body = body;
         this.readMinutes = readMinutes;
+    }
+
+    public CivicContent(String title, String category, String summary, String body, Integer readMinutes, String sourceUrl) {
+        this.title = title;
+        this.category = category;
+        this.summary = summary;
+        this.body = body;
+        this.readMinutes = readMinutes;
+        this.sourceUrl = sourceUrl;
     }
 }
