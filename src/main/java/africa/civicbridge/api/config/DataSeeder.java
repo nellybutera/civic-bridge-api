@@ -3,6 +3,7 @@ package africa.civicbridge.api.config;
 import africa.civicbridge.api.entity.*;
 import africa.civicbridge.api.repository.*;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -15,23 +16,25 @@ public class DataSeeder implements CommandLineRunner {
     private final QuizRepository quizzes;
     private final ForumPostRepository forum;
     private final TrackerItemRepository tracker;
+    private final PasswordEncoder passwordEncoder;
 
     public DataSeeder(AppUserRepository users, CivicContentRepository content, QuizRepository quizzes,
-                       ForumPostRepository forum, TrackerItemRepository tracker) {
+                       ForumPostRepository forum, TrackerItemRepository tracker, PasswordEncoder passwordEncoder) {
         this.users = users;
         this.content = content;
         this.quizzes = quizzes;
         this.forum = forum;
         this.tracker = tracker;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void run(String... args) {
-        if (users.count() == 0) {
-            users.save(new AppUser("Amina Okafor", "admin@civicbridge.africa", "admin123", "Admin"));
-            users.save(new AppUser("Kwame Mensah", "moderator@civicbridge.africa", "mod123", "Moderator"));
-            users.save(new AppUser("Nia Uwimana", "youth@civicbridge.africa", "youth123", "Youth User"));
-        }
+        // Upsert (not count()==0 gated): also migrates any pre-existing plaintext
+        // demo passwords from before hashing was added, without wiping real signups.
+        upsertSeedUser("Amina Okafor", "admin@civicbridge.africa", "admin123", "Admin");
+        upsertSeedUser("Kwame Mensah", "moderator@civicbridge.africa", "mod123", "Moderator");
+        upsertSeedUser("Nia Uwimana", "youth@civicbridge.africa", "youth123", "Youth User");
 
         if (content.count() == 0) {
             content.save(new CivicContent(
@@ -93,6 +96,17 @@ public class DataSeeder implements CommandLineRunner {
                     "Continental framework adopted; national digital ID interoperability still in pilot phase."));
             tracker.save(new TrackerItem("EAC Single Tourist Visa", "In Force", 90,
                     "Live across member states with strong adoption among regional travellers."));
+        }
+    }
+
+    private void upsertSeedUser(String name, String email, String rawPassword, String role) {
+        AppUser user = users.findByEmail(email).orElseGet(() -> new AppUser(name, email, null, role));
+        boolean alreadyHashed = user.getPassword() != null && user.getPassword().startsWith("$2");
+        if (!alreadyHashed) {
+            user.setName(name);
+            user.setRole(role);
+            user.setPassword(passwordEncoder.encode(rawPassword));
+            users.save(user);
         }
     }
 }
