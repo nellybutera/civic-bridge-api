@@ -22,7 +22,7 @@ public class Question {
     @Column(columnDefinition = "TEXT")
     private String prompt;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "question_options", joinColumns = @JoinColumn(name = "question_id"))
     @Column(name = "option_text")
     @OrderColumn(name = "option_order")
